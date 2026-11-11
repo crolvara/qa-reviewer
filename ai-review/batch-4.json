@@ -1,0 +1,162 @@
+[
+  {
+    "callId": "CALL-016",
+    "overall": "minor_issues",
+    "rationale": "Direction, DPA, cause, Direct Debit status and next steps are accurate. The only problem is that the summary states the amount of the payment taken during the call, which the rules forbid.",
+    "findings": [
+      {
+        "type": "rule_breach",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": "Payment of £230 made",
+        "turns": ["T10", "T11", "T14"],
+        "title": "Amount of immediate payment stated",
+        "explanation": "The customer paid the missed instalment by card during the call (T10-T14). The rules say never include amounts for payments taken during the call and to use the phrase \"Payment made.\" The amount is also a missed instalment figure, so it reveals arrears.",
+        "suggestedFix": "Replace with \"payment made\" and leave out the amount."
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company and arrears were discussed. A misunderstanding of pending and available bank balances left insufficient funds for the Direct Debit. The agent checked the customer's understanding; payment made, and the existing Direct Debit remains active with the next collection on 10 November. The next steps are to retain the emailed payment confirmation, check the bank's balance display, ensure funds are available for collection and contact the company if anything differs from what was discussed."
+  },
+  {
+    "callId": "CALL-017",
+    "overall": "needs_correction",
+    "rationale": "The hold length is wrong: it was fourteen days, not thirty. The summary also leaves out the bereavement and the frozen joint account, which are the vulnerability and the reason for non-payment.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "A thirty-day hold on collection contact was applied",
+        "turns": ["T13", "T19"],
+        "title": "Hold length wrong: fourteen days, not thirty",
+        "explanation": "The agent offered and applied a fourteen-day hold on collection contact (T13: \"fourteen-day hold\"; T19: \"I've applied the fourteen-day contact hold\"). This matches the 3 November review call, which is 14 days after the 20 October call date.",
+        "suggestedFix": "A fourteen-day hold on collection contact was applied"
+      },
+      {
+        "type": "omission",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": ["T06", "T08", "T10", "T11", "T12"],
+        "title": "Bereavement and frozen joint account omitted",
+        "explanation": "The customer's mother died last month (T06). The bank froze the joint account holding the car payment money while it processes bereavement paperwork, and gave no date for access (T08, T10). The customer still has their regular job (T10). The rules require specific severe hardship details, such as frozen bank accounts after a bereavement, and require the vulnerability to be stated. The summary only says consent was gained, without saying what was recorded.",
+        "suggestedFix": "Add: \"The customer's mother died last month and the bank froze the joint account holding the car payment money while bereavement paperwork is processed, with no date given for access.\" Then: \"Consent gained to record vulnerability for the bereavement and frozen account.\""
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed; the customer's mother died last month and the bank froze the joint account holding the car payment money while bereavement paperwork is processed, with no date given for access. Consent gained to record vulnerability for the bereavement and frozen account. The customer was referred to Citizens Advice, and the agent checked understanding that a contact hold does not cancel the arrears. A fourteen-day hold on collection contact was applied; the next steps are to seek advice and update the company if bank access changes before the company's review call on 3 November; no payment commitment was made."
+  },
+  {
+    "callId": "CALL-018",
+    "overall": "needs_correction",
+    "rationale": "The summary says Authority to Act was verified for the partner, but the customer refused it and the agent declined to discuss the account with the partner. It also leaves out the customer's explicit I&E refusal.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "Authority to Act was verified for the partner",
+        "turns": ["T07", "T08", "T09", "T10", "T22"],
+        "title": "Authority to Act was refused, not verified",
+        "explanation": "When asked, the customer said \"No, not the details\" (T08). The agent refused to discuss the balance with the partner without authority (T10). The agent then confirmed \"No Authority to Act has been granted to your partner\" (T22). A colleague relying on the summary could wrongly disclose account details to the partner.",
+        "suggestedFix": "The customer did not authorise the partner, no Authority to Act was granted and the agent refused to discuss the balance with the partner."
+      },
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": ["T14", "T15", "T16"],
+        "title": "I&E refusal omitted",
+        "explanation": "The agent offered an income and expenditure assessment (T14). The customer refused: \"No, I don't want to do that. I know my finances\" (T15). The agent confirmed \"you've declined the assessment\" (T16). The rules require the summary to state that the customer declined an I&E.",
+        "suggestedFix": "Add \"The customer declined an I&E assessment.\""
+      },
+      {
+        "type": "rule_breach",
+        "severity": "minor",
+        "certainty": "uncertain",
+        "summaryQuote": "Reduced working hours lowered monthly income by £220.",
+        "turns": ["T13"],
+        "title": "Hours reduction detail generalised",
+        "explanation": "The customer said their hours were cut from five days to four, about £220 less a month, temporary with no end date (T13). The specificity rule favours keeping these details. This is a judgement call because the summary already states the cause and the amount.",
+        "suggestedFix": "Hours reduced from five days to four, lowering monthly income by about £220, described as temporary with no end date."
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company with their partner present; the customer did not authorise the partner, no Authority to Act was granted and the agent refused to discuss the balance with the partner, so arrears were discussed with the customer only. Hours reduced from five days to four, lowering monthly income by about £220, described as temporary with no end date. The customer declined an I&E assessment; the agent checked understanding, and the customer agreed to pay £75 through the online portal on 26 October. The next steps are for the customer to call on 27 October to review the payment and remaining arrears."
+  },
+  {
+    "callId": "CALL-019",
+    "overall": "needs_correction",
+    "rationale": "This was an outbound call, but the summary says the customer called the company. The summary also lacks the required consent phrase and gives the assessment call as 2 pm, when the agreed time was after 2 pm.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "The customer called the company",
+        "turns": ["T01", "T02"],
+        "title": "Call direction wrong: outbound, not inbound",
+        "explanation": "The agent opens by asking for the customer by name and saying they are calling from vehicle finance collections (T01), and the customer answers \"That's me\" (T02). Under the rules this is an outbound call.",
+        "suggestedFix": "The company called and reached the customer"
+      },
+      {
+        "type": "rule_breach",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": "the customer disclosed the condition",
+        "turns": ["T09", "T10", "T11"],
+        "title": "Required consent phrase missing",
+        "explanation": "The agent asked permission to note the depression and reduced pay (T09), the customer agreed (T10: \"Yes, you can record that\"), and the agent thanked them for the permission (T11). The rules require the exact phrase \"Consent gained to record vulnerability.\" Saying the customer \"disclosed the condition\" does not show that consent was obtained.",
+        "suggestedFix": "consent gained to record vulnerability"
+      },
+      {
+        "type": "unsupported",
+        "severity": "minor",
+        "certainty": "definite",
+        "summaryQuote": "at 2 pm",
+        "turns": ["T15", "T22"],
+        "title": "Call time is after 2 pm, not at 2 pm",
+        "explanation": "The agent offered to call on 23 October \"after two\" (T15), and the customer repeated \"speak Friday after two\" (T22). The call date is Tuesday 20 October, so Friday is 23 October and the date is correct. No exact 2 pm time was agreed.",
+        "suggestedFix": "after 2 pm"
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. Absence from work due to depression for about six weeks reduced monthly income by roughly £500 since full pay ended and sick pay began; consent gained to record vulnerability. An I&E assessment was arranged, the customer was referred to StepChange and customer signposted to the company website, and the customer confirmed understanding that the contact hold does not write off the arrears or prevent credit file impact. A seven-day hold on collection contact was applied while retaining the agreed assessment call; the next steps are to prepare financial figures with the support worker, seek advice and take the company's call on 23 October after 2 pm; no payment was agreed."
+  },
+  {
+    "callId": "CALL-020",
+    "overall": "needs_correction",
+    "rationale": "The summary invents an £80 promise to pay that the customer explicitly refused to make. It also leaves out the explicit risk of further action warning and the £210 childcare cost.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "the customer agreed to pay £80 on 23 October",
+        "turns": ["T16", "T17", "T22"],
+        "title": "Invented £80 promise to pay",
+        "explanation": "The customer said \"maybe eighty on Friday. Actually, don't write Friday down as agreed\" (T16). The agent confirmed \"we won't record the eighty as a promise\" (T17), and the customer repeated \"I haven't promised eighty\" (T22). No future payment was agreed.",
+        "suggestedFix": "Remove the clause. Optionally add: \"a possible £80 payment on Friday was explicitly not recorded as a promise.\""
+      },
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": ["T19"],
+        "title": "Risk of further action warning omitted",
+        "explanation": "The agent explicitly said \"the account remains at risk of further action\" (T19). The rules say the summary must use the phrase \"risk of further action\" when the customer was explicitly warned.",
+        "suggestedFix": "Add \"the agent warned that the account remains at risk of further action.\""
+      },
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": ["T10", "T12"],
+        "title": "Childcare cost of £210 and its cause omitted",
+        "explanation": "The customer said the emergency childcare cost £210 (T10) and that the school closed for three days because of a heating problem (T12). The rules require specific financial values for factors affecting ability to pay. The summary mentions the childcare but not the amount.",
+        "suggestedFix": "emergency childcare costing £210 during a three-day school closure due to a heating problem caused a shortfall"
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company, arrears and a default notice were discussed, and emergency childcare costing £210 during a three-day school closure due to a heating problem caused a shortfall. The customer declined an I&E assessment today; the agent warned that the account remains at risk of further action and checked understanding that the payment did not resolve the notice or all arrears. Payment made; a possible £80 payment on Friday was explicitly not recorded as a promise. The next steps are to read the notice, prepare income and essential expense figures and call on 23 October after work to review affordability."
+  }
+]

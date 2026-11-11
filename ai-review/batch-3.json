@@ -1,0 +1,146 @@
+[
+  {
+    "callId": "CALL-011",
+    "overall": "needs_correction",
+    "rationale": "Facts, dates and the hold are accurate, but the agent directed the customer to the website support page and the required phrase \"customer signposted\" is missing.",
+    "findings": [
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": [
+          "T15",
+          "T22"
+        ],
+        "title": "Missing required phrase \"customer signposted\"",
+        "explanation": "The agent told the customer the website has a support page with MoneyHelper contact details and help information (T15), and the customer confirmed they would look at it (T22). Rules require the phrase \"customer signposted\" when the customer is directed to the website for help.",
+        "suggestedFix": "Add \"customer signposted\", e.g. \"The customer was referred to MoneyHelper and customer signposted to the website support page.\""
+      },
+      {
+        "type": "rule_breach",
+        "severity": "minor",
+        "certainty": "uncertain",
+        "summaryQuote": "A broken wrist caused absence from work, with sick pay reducing monthly income by £400",
+        "turns": [
+          "T08"
+        ],
+        "title": "Cause and income drop slightly generalised",
+        "explanation": "The customer broke their wrist coming off their bike (not a work accident), is signed off for another three weeks, and sick pay is \"about\" £400 a month less than usual wages. The summary drops the bike accident, the three-week sign-off and the approximation. Judgement call on how much detail rule 4 requires.",
+        "suggestedFix": "The customer broke their wrist in a bike accident and is signed off work for another three weeks, with sick pay about £400 a month less than usual wages."
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. The customer broke their wrist in a bike accident and is signed off work for another three weeks, with sick pay about £400 a month less than usual wages; consent gained to record vulnerability. The customer was referred to MoneyHelper and customer signposted to the website support page, and the agent checked understanding that the contact hold does not cancel the instalment or arrears. A fourteen-day hold on collection contact was applied, and the next steps are for the customer to seek advice and confirm their return-to-work date before the company calls on 3 November to review income and discuss an affordable plan."
+  },
+  {
+    "callId": "CALL-012",
+    "overall": "needs_correction",
+    "rationale": "Most content is accurate, but the summary says the father's Authority to Act is ongoing when it was explicitly limited to this call only.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "whose ongoing Authority to Act was verified",
+        "turns": [
+          "T08",
+          "T09",
+          "T23"
+        ],
+        "title": "Authority to Act was for this call only, not ongoing",
+        "explanation": "The customer authorised her father \"just while we're on together\" and did not want him added for future calls (T08). The agent confirmed \"Authority to Act is verified for this call only\" (T09), and the customer repeated this (T23). Recording it as ongoing could lead a colleague to discuss the account with the father without authority.",
+        "suggestedFix": "whose Authority to Act was verified for this call only"
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company with their father, whose Authority to Act was verified for this call only, and arrears were discussed. A lack of agency shifts in September on a zero-hour contract caused two missed payments, and future shifts remained uncertain. The I&E assessment was deferred until the payslip and rota are available, possible credit file impact for the account holder was explained, and the agent checked the customer’s understanding. The next steps are for the customer to prepare income and essential expense figures for the company’s call on 23 October after 3 pm; no payment commitment was made."
+  },
+  {
+    "callId": "CALL-013",
+    "overall": "needs_correction",
+    "rationale": "The summary wrongly records \"Payment made\" when no payment was taken, and omits the agent's declined attempt to take a payment during the call.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "Payment made;",
+        "turns": [
+          "T12",
+          "T22",
+          "T23"
+        ],
+        "title": "\"Payment made\" stated but no payment was taken",
+        "explanation": "The customer said they had no funds today (T12) and \"I haven't paid anything today\" (T22); the agent confirmed \"no payment has been taken today\" (T23). Only a future promise of £60 on 23 October exists.",
+        "suggestedFix": "Remove \"Payment made\" and record the declined attempt instead."
+      },
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": [
+          "T11",
+          "T12"
+        ],
+        "title": "Declined payment attempt not recorded",
+        "explanation": "The agent asked whether the customer could make a payment towards the arrears during the call (T11); the customer declined as the account was nearly empty until Friday's pay (T12). Rules require recording a failed or declined attempt.",
+        "suggestedFix": "Add \"Agent attempted to secure payment, but customer declined as funds are unavailable until payday.\""
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. Replacing a failed washing machine for £340 used the funds reserved for the instalment. Agent attempted to secure payment, but customer declined as funds are unavailable until payday; the agent checked affordability and the customer’s understanding, and the customer agreed to pay £60 by bank transfer on 23 October using their account reference. The next steps are for the customer to retain the transfer confirmation and for the company to call on 27 October, preferably after 10 am, to review receipt and the remaining arrears."
+  },
+  {
+    "callId": "CALL-014",
+    "overall": "needs_correction",
+    "rationale": "DPA status, direction, dates and the non-committal £80 estimate are handled correctly, but the summary names the customer's new employer.",
+    "findings": [
+      {
+        "type": "rule_breach",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": "the first wage payment from Cedar Lane Distribution will cover only part of a month",
+        "turns": [
+          "T08"
+        ],
+        "title": "Private employer name included",
+        "explanation": "The customer named their new employer (T08). Rule 3 requires specific entity names such as employers to be redacted.",
+        "suggestedFix": "the first wage payment from the new job on 28 October will cover only part of a month"
+      }
+    ],
+    "correctedSummary": "No DPA stated with agent. The customer called the company and arrears were discussed. The customer changed jobs and a week between finishing and starting reduced income, and the first wage payment from the new job on 28 October will cover only part of a month. An I&E assessment was planned and the agent checked the customer’s understanding; no payment amount was committed. The next steps are for the customer to prepare income and essential expense figures and call on 28 October after work to agree an affordable arrangement."
+  },
+  {
+    "callId": "CALL-015",
+    "overall": "needs_correction",
+    "rationale": "The agent explicitly warned that the account is at risk of further action, which the summary must state but omits; other facts and the 22 October date are correct.",
+    "findings": [
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": [
+          "T13",
+          "T15"
+        ],
+        "title": "Risk of further action warning omitted",
+        "explanation": "The agent stated \"the account is at risk of further action if the arrears remain unresolved\" (T13) and repeated the warning (T15). Rules require the phrase \"risk of further action\" when this warning is given.",
+        "suggestedFix": "Add \"The customer was warned that the account is at risk of further action if the arrears remain unresolved.\""
+      },
+      {
+        "type": "rule_breach",
+        "severity": "minor",
+        "certainty": "uncertain",
+        "summaryQuote": "Loss of an evening cleaning job reduced monthly income by £250",
+        "turns": [
+          "T08",
+          "T10"
+        ],
+        "title": "Cause of job loss not stated specifically",
+        "explanation": "The customer lost the evening cleaning job because the office shut and staff were not moved elsewhere (T08), and has cut some spending without covering the shortfall (T10). Adding the office closure better meets the specific cause rule; judgement call as the core cause is already present.",
+        "suggestedFix": "Loss of an evening cleaning job when the office closed reduced monthly income by £250, while the daytime job continued."
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. Loss of an evening cleaning job when the office closed reduced monthly income by £250, while the daytime job continued. The customer was warned that the account is at risk of further action if the arrears remain unresolved, an I&E assessment was arranged and the agent checked understanding that the assessment does not clear the missed payments. The next steps are for the customer to prepare remaining income and essential expense figures for the company’s call on 22 October after 6 pm; no payment amount was agreed."
+  }
+]

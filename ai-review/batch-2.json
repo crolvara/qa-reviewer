@@ -1,0 +1,112 @@
+[
+  {
+    "callId": "CALL-006",
+    "overall": "accurate",
+    "rationale": "Direction, DPA, third-party Authority to Act for this call only, cause, the £220 bank transfer promise on 30 October and the 2 November review all match the transcript.",
+    "findings": [],
+    "correctedSummary": null
+  },
+  {
+    "callId": "CALL-007",
+    "overall": "minor_issues",
+    "rationale": "Facts are correct: outbound call, DPA completed, bank change not saved, payment made with no amount stated, new Direct Debit from 16 November. The only problem is grammatical, in how the required phrase is joined to the sentence.",
+    "findings": [
+      {
+        "type": "rule_breach",
+        "severity": "minor",
+        "certainty": "definite",
+        "summaryQuote": "The agent checked the customer’s understanding; Payment made,",
+        "turns": [
+          "T15",
+          "T23",
+          "T24"
+        ],
+        "title": "\"Payment made\" capitalised mid-sentence after a semicolon",
+        "explanation": "The required phrase \"Payment made\" is inserted mid-sentence after a semicolon with a capital P, which reads as a grammatical error. The understanding check (T23-T24) also happened after the payment (T15), so the order is reversed.",
+        "suggestedFix": "Payment made, and a new Direct Debit instruction was set up for scheduled instalments starting on 16 November, and the agent checked the customer’s understanding."
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. A change to a new bank account was not saved after the customer lost phone signal, leaving the Direct Debit linked to the old account without enough funds. Payment made, and a new Direct Debit instruction was set up for scheduled instalments starting on 16 November, and the agent checked the customer’s understanding. The next steps are to check the emailed confirmation and call the company if it has not arrived within three working days."
+  },
+  {
+    "callId": "CALL-008",
+    "overall": "needs_correction",
+    "rationale": "The summary invents a default notice that was never mentioned; the customer only referred to an arrears letter. The rest (inbound, DPA, job change, £120 via portal on 30 October, call on 2 November after 5.30 pm) is accurate.",
+    "findings": [
+      {
+        "type": "unsupported",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "The agent confirmed a default notice had been issued",
+        "turns": [
+          "T06",
+          "T07",
+          "T15"
+        ],
+        "title": "Default notice invented; only an arrears letter was mentioned",
+        "explanation": "No default notice is mentioned anywhere. The customer refers to \"the arrears letter\" (T06), and the agent only confirms a missed payment (T07) and that remaining arrears still need a plan (T15). Recording a default notice would mislead a colleague about the account's status.",
+        "suggestedFix": "Remove the default notice claim, e.g. \"The agent checked the customer’s understanding, and the customer agreed to pay £120 through the online portal on 30 October.\""
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company about an arrears letter, and arrears were discussed. A job change moved payday from the twenty-fifth to the last Friday of the month, causing the missed payment. The agent checked the customer’s understanding, and the customer agreed to pay £120 through the online portal on 30 October. The next steps are for the customer to reset their portal password and contact the company if wages are delayed, and for the company to call on 2 November, preferably after 5.30 pm, about the remaining arrears."
+  },
+  {
+    "callId": "CALL-009",
+    "overall": "needs_correction",
+    "rationale": "The summary says the customer refused an I&E, but the customer only deferred it and agreed an assessment call for 21 October after 6 pm. The overtime loss is also given as an exact figure when the customer said about £300.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": "The customer refused an I&E assessment scheduled for 21 October after 6 pm",
+        "turns": [
+          "T11",
+          "T12",
+          "T13",
+          "T14",
+          "T15",
+          "T20"
+        ],
+        "title": "I&E deferred to a scheduled call, not refused",
+        "explanation": "When asked to complete an I&E (T11), the customer said \"Not right now. I'm at work. I can do it tomorrow evening\" (T12) and agreed a time after six (T14). The agent arranged the assessment for 21 October (T13, T15). This is a deferral, not a refusal. Recording an I&E refusal wrongly flags the customer as not engaging.",
+        "suggestedFix": "The customer could not complete an I&E while at work and agreed to an assessment call on 21 October after 6 pm."
+      },
+      {
+        "type": "contradicted",
+        "severity": "minor",
+        "certainty": "definite",
+        "summaryQuote": "reducing monthly income by £300",
+        "turns": [
+          "T08"
+        ],
+        "title": "Approximate overtime loss stated as exact",
+        "explanation": "The customer said the Saturday overtime was \"about three hundred pounds a month extra\" (T08). The summary presents it as an exact figure.",
+        "suggestedFix": "Saturday overtime was stopped until Christmas, reducing monthly income by about £300."
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. Saturday overtime was stopped until Christmas, reducing monthly income by about £300. The agent attempted to secure a payment, but the customer declined as they only had enough for shopping and travel, and possible credit file impact was explained. The customer could not complete an I&E while at work, so an assessment call was scheduled for 21 October after 6 pm; the agent checked the customer’s understanding, no payment amount was agreed, and the next steps are for the customer to prepare income and expense figures for that call."
+  },
+  {
+    "callId": "CALL-010",
+    "overall": "needs_correction",
+    "rationale": "Direction, DPA (pre-call security confirmed), the £205 portal promise for 27 October and the new Direct Debit are correct, but the required specific reason for non-payment (husband cancelled the Direct Debit by mistake during the divorce) is missing.",
+    "findings": [
+      {
+        "type": "omission",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": [
+          "T08",
+          "T10",
+          "T17"
+        ],
+        "title": "Specific reason for non-payment omitted (divorce DD mix-up)",
+        "explanation": "The customer explained that during their divorce her husband cancelled payments from the joint account when moving his bills out and cancelled this Direct Debit by mistake (T08, T10), and that the arrears were caused by the cancelled instruction, not a drop in income (T17). The rules require the specific cause of non-payment, and this is the rules' own example.",
+        "suggestedFix": "Add: \"During the customer’s divorce, her husband cancelled the Direct Debit from their joint account by mistake, causing the missed instalment; the customer has since opened her own account.\""
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company and arrears were discussed. During the customer’s divorce, her husband cancelled the Direct Debit from their joint account by mistake, causing the missed instalment, and the customer has since opened her own account. A new Direct Debit instruction was set up from the new account for future collections, the agent checked affordability and the customer’s understanding, and the customer agreed to pay £205 through the online portal on 27 October. The next steps are to check the confirmations and contact the company before the payment date if any details differ."
+  }
+]

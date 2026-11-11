@@ -1,0 +1,107 @@
+[
+  {
+    "callId": "CALL-001",
+    "overall": "minor_issues",
+    "rationale": "Direction, DPA, cause, payment and the new Direct Debit date (9 November 2026 is correctly a Monday after the Sunday 8th) are accurate. The only concern is a stated £240 figure that equals both the arrears and the payment taken.",
+    "findings": [
+      {
+        "type": "rule_breach",
+        "severity": "minor",
+        "certainty": "uncertain",
+        "summaryQuote": "The next payment of £240 is due by Direct Debit on 9 November",
+        "turns": [
+          "T05",
+          "T15",
+          "T19"
+        ],
+        "title": "Stated £240 equals the arrears and payment-made amounts",
+        "explanation": "T19 gives the next collection as £240, which is a regular instalment rather than arrears, so it is not strictly forbidden. However, T05 gives arrears of £240 and T15 a payment of £240, so the figure indirectly discloses both amounts the rules say must never be stated. Judgement call, as the rules do not explicitly cover scheduled instalment amounts.",
+        "suggestedFix": "The next Direct Debit collection is due on 9 November, as the eighth falls on a Sunday."
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company and arrears were discussed. The missed payment arose because their employer moved payday from the last working day of the month to the fifth, causing the Direct Debit to be returned. Payment made, and the Direct Debit date was changed to the eighth, with the next collection due on 9 November as the eighth falls on a Sunday; the agent confirmed the customer's understanding of the plan. The next steps are to check the confirmation email and ensure funds are available for that collection."
+  },
+  {
+    "callId": "CALL-002",
+    "overall": "needs_correction",
+    "rationale": "The promise to pay amount is wrong: the customer revised £150 down to £100 and confirmed £100. The rest of the summary, including the declined I&E and failed payment attempt, is accurate.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "The customer agreed to pay £150 through the online portal on 23 October",
+        "turns": [
+          "T14",
+          "T15",
+          "T16",
+          "T22"
+        ],
+        "title": "Promise to pay recorded as £150 instead of £100",
+        "explanation": "At T14 the customer floated £150 but immediately withdrew it because of the electricity bill and said it would have to be £100. The agent confirmed £100 at T15, the customer agreed 'a hundred on the twenty-third' at T16 and repeated 'a hundred Friday online' at T22.",
+        "suggestedFix": "The customer agreed to pay £100 through the online portal on 23 October"
+      }
+    ],
+    "correctedSummary": "DPA completed. The company called and reached the customer, and arrears were discussed. A clutch repair costing £780 prevented the customer from making the instalment despite unchanged working hours and wages, the customer declined an I&E assessment, and the agent checked the customer's understanding. The agent attempted to secure a payment during the call, but the customer declined; the customer agreed to pay £100 through the online portal on 23 October. The next steps are for the company to call on 26 October after 4 pm to review the remaining arrears."
+  },
+  {
+    "callId": "CALL-003",
+    "overall": "needs_correction",
+    "rationale": "The summary records consent to record vulnerability when the customer explicitly refused it, states the arrears amount, and omits that the customer has no money for food. The hold music hallucination at T15 was correctly ignored.",
+    "findings": [
+      {
+        "type": "contradicted",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": "Consent gained to record vulnerability.",
+        "turns": [
+          "T09",
+          "T10",
+          "T11"
+        ],
+        "title": "Consent recorded although the customer refused it",
+        "explanation": "At T09 the agent asked to record the anxiety. At T10 the customer said 'I'd rather you didn't write the health bit down' and at T11 the agent agreed not to record the health information. Consent was declined, not gained.",
+        "suggestedFix": "State that the customer disclosed a health concern but declined consent for it to be recorded, and remove 'Consent gained to record vulnerability.'"
+      },
+      {
+        "type": "rule_breach",
+        "severity": "major",
+        "certainty": "definite",
+        "summaryQuote": "arrears of £460 were discussed",
+        "turns": [
+          "T05"
+        ],
+        "title": "Arrears amount stated",
+        "explanation": "The agent quoted arrears of £460 at T05. The rules forbid stating specific arrears or balance values.",
+        "suggestedFix": "arrears were discussed"
+      },
+      {
+        "type": "omission",
+        "severity": "critical",
+        "certainty": "definite",
+        "summaryQuote": null,
+        "turns": [
+          "T08"
+        ],
+        "title": "Severe hardship omitted: no money for food",
+        "explanation": "At T08 the customer said 'I've got no money for food just now' and is relying on a family member bringing shopping. The rules require severe hardship specifics such as having no money for food to be reported.",
+        "suggestedFix": "Add: The customer stated they have no money for food and are relying on a family member for shopping."
+      }
+    ],
+    "correctedSummary": "DPA completed. The customer called the company and arrears were discussed. The customer's partner left taking all joint savings, their zero-hour contract provided no shifts this week, and they stated they have no money for food and are relying on a family member for shopping; the customer disclosed a health concern but declined consent for it to be recorded. The I&E assessment was deferred until the rota is available, the agent explained possible credit file impact, and the customer was referred to Citizens Advice and customer signposted to the company website for support, with the agent checking the customer's understanding. A thirty-day hold on collection contact was applied, no payment was agreed, and the next steps are to seek advice before the company calls on 4 November to review the position and complete the I&E assessment."
+  },
+  {
+    "callId": "CALL-004",
+    "overall": "accurate",
+    "rationale": "Direction (customer returning a missed call), DPA, the £180 rent increase, the completed I&E with about £60 surplus, the £40 promise on 28 October via the portal and the next steps all match the transcript.",
+    "findings": [],
+    "correctedSummary": null
+  },
+  {
+    "callId": "CALL-005",
+    "overall": "accurate",
+    "rationale": "Outbound call, DPA, the £800 turbo failure, the declined card attempt, no payment agreed and the call on 21 October after 1 pm (correctly the day after the Tuesday call date) all match the transcript.",
+    "findings": [],
+    "correctedSummary": null
+  }
+]
