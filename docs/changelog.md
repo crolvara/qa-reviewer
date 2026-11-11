@@ -16,6 +16,14 @@ Completed tasks, newest first. Format:
 - Verified in Edge headless (Playwright): dialog opens, Esc/backdrop cancel, "2" ignored while open, confirm clears reviews, no native dialog fired, fits at 320px.
 - Files: `src/components/ConfirmDialog.tsx` (new), `src/components/ReviewApp.tsx`.
 
+## 2026-11-11 - Post-review polish
+- Verdict warning counts pending *critical* findings only (was any open critical + any pending).
+- Shortcuts stay active when focus is on a checkbox/radio; only text entry blocks them. Esc works even with shortcuts off (not a character key, WCAG 2.1.4).
+- Advice bodies matched with spacing variants (`MoneyHelper` / `Money Helper`), one rule per body.
+- Evidence turn text shown inside the expanded finding card; transcript auto-scroll only on the desktop layout, respects reduced motion.
+- Tabs merge per call by `updatedAt` (newest wins) instead of replacing state; Reset broadcasts via `qa-reviewer:reset-at` so other tabs clear too.
+- Verified on local `next start`: 27/27 browser checks, 0 console errors; rule dedupe unchanged on real data.
+
 ## 2026-11-11 - Fixes from independent review (correctness, security, a11y)
 - Verdict tied to findings: confirmed/rejected/pending counts, warnings for contradictions (Accurate with confirmed findings, verdict without support, Needs correction without corrected summary). Click no longer silently clears a verdict; explicit "Clear verdict".
 - Dedupe: rule finding merges into an AI finding only when the AI title is about the same rule (`matchKey`) and quote/turns overlap. Verified: one turn with signposting + MoneyHelper now yields both findings; real data unchanged (6 Rule-confirmed).

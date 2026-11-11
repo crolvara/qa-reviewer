@@ -17,7 +17,13 @@ const US_SPELLINGS: Array<[RegExp, string]> = [
   [/\bcolor\b/i, "colour"],
 ];
 
-const ADVICE_BODIES = ["StepChange", "Citizens Advice", "MoneyHelper", "Money Helper", "National Debtline"];
+// One entry per body; the pattern tolerates spacing variants ("MoneyHelper" / "Money Helper").
+const ADVICE_BODIES: Array<[string, RegExp]> = [
+  ["StepChange", /step\s*change/i],
+  ["Citizens Advice", /citizens\s*advice/i],
+  ["MoneyHelper", /money\s*helper/i],
+  ["National Debtline", /national\s*debt\s*line/i],
+];
 
 export function splitSentences(text: string): string[] {
   // Split on sentence-ending punctuation followed by a capital letter, so "5.30 pm" stays intact.
@@ -101,8 +107,7 @@ export function runRuleChecks(callId: string, summary: string, turns: Turn[]): F
     });
   }
 
-  for (const body of ADVICE_BODIES) {
-    const re = new RegExp(body, "i");
+  for (const [body, re] of ADVICE_BODIES) {
     const bodyTurns = agentTurns(turns, re);
     if (bodyTurns.length && !re.test(summary)) {
       add({
@@ -161,7 +166,7 @@ export function runRuleChecks(callId: string, summary: string, turns: Turn[]): F
 /** What an AI finding must talk about to be treated as the same issue as a rule finding. */
 function matchKeyFor(title: string): RegExp {
   const referral = title.match(/^Referral to (.+) not mentioned$/);
-  if (referral?.[1]) return new RegExp(referral[1].replace(/\s+/g, "\\s*"), "i");
+  if (referral?.[1]) return ADVICE_BODIES.find(([name]) => name === referral[1])?.[1] ?? /(?!)/;
   if (/^Arrears/.test(title)) return /arrears|balance/i;
   if (/^Amount of payment/.test(title)) return /payment/i;
   if (/^Call direction/.test(title)) return /direction|inbound|outbound|called/i;

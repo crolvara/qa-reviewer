@@ -5,6 +5,7 @@ import type { Call, CallReview, Finding } from "./types";
 import { EMPTY_REVIEW } from "./types";
 
 const STORAGE_KEY = "qa-reviewer:v1";
+const RESET_KEY = "qa-reviewer:reset-at";
 
 type Reviews = Record<string, CallReview>;
 
@@ -72,7 +73,22 @@ export function useReviews() {
     setLoaded(true);
     // Another tab saved: adopt its state instead of overwriting it on our next write.
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setReviews(load());
+      // A reset in another tab must clear this tab too, not be merged back.
+      if (e.key === RESET_KEY) {
+        setReviews({});
+        return;
+      }
+      if (e.key !== STORAGE_KEY) return;
+      // Merge per call, newest updatedAt wins, so edits to different calls in two tabs both survive.
+      const incoming = load();
+      setReviews((prev) => {
+        const merged: Reviews = { ...prev };
+        for (const [id, r] of Object.entries(incoming)) {
+          const mine = prev[id];
+          if (!mine || (r.updatedAt ?? "") > (mine.updatedAt ?? "")) merged[id] = r;
+        }
+        return merged;
+      });
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -100,7 +116,12 @@ export function useReviews() {
     }));
   }, []);
 
-  const reset = useCallback(() => setReviews({}), []);
+  const reset = useCallback(() => {
+    try {
+      window.localStorage.setItem(RESET_KEY, new Date().toISOString());
+    } catch {}
+    setReviews({});
+  }, []);
 
   return { reviews, loaded, update, reset, saveFailed };
 }

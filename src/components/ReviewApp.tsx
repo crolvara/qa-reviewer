@@ -61,19 +61,26 @@ export default function ReviewApp() {
 
   // Keyboard: J/K next/previous call, 1/2/3 verdict. Ignored while typing.
   useEffect(() => {
-    if (!shortcutsOn) return;
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      // Ignore only text entry. Checkboxes and radios do not consume letters, so shortcuts stay live after clicking one.
+      const typing =
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLInputElement && !["checkbox", "radio", "button", "submit"].includes(target.type)) ||
+        !!target?.isContentEditable;
+      if (typing) return;
       // A modal is open: shortcuts must not change data behind it.
       if (target?.closest?.("dialog[open]")) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       // Holding a key must not race through calls or re-set verdicts.
       if (e.repeat) return;
+      // Esc is not a character-key shortcut (WCAG 2.1.4), so it works even when shortcuts are off.
       if (e.key === "Escape") {
         setSelectedFinding(null);
         return;
       }
+      if (!shortcutsOn) return;
       // Case-insensitive so Caps Lock or Shift does not silently break shortcuts.
       const key = e.key.toLowerCase();
       // Navigate within the filtered queue, relative to the current call's position in
@@ -100,8 +107,6 @@ export default function ReviewApp() {
 
   const findings = allFindings(call, review);
   const highlightedTurns = findings.find((f) => f.id === selectedFinding)?.turns ?? [];
-  const counts = severityCounts(call, review);
-  const hasOpenCritical = counts.critical > 0;
 
   const exportCsv = () => download(`qa-review-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(CALLS, reviews), "text/csv;charset=utf-8");
   const exportJson = () => download(`qa-review-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(reviews, null, 2), "application/json");
@@ -205,7 +210,7 @@ export default function ReviewApp() {
               <input type="checkbox" checked={shortcutsOn} onChange={(e) => toggleShortcuts(e.target.checked)} />
               Keyboard shortcuts
             </label>
-            {shortcutsOn && <p className="mt-0.5">J/K next/previous · 1/2/3 verdict · Esc clear selection</p>}
+            <p className="mt-0.5">{shortcutsOn ? "J/K next/previous · 1/2/3 verdict · " : ""}Esc clear selection</p>
           </div>
         </nav>
 
@@ -284,7 +289,8 @@ export default function ReviewApp() {
               const pending = pre.length - pre.filter((f) => review.decisions[f.id]).length;
               const warnings: string[] = [];
               if (review.verdict === "accurate" && confirmed > 0) warnings.push(`${confirmed} confirmed finding(s) contradict "Accurate".`);
-              if (review.verdict === "accurate" && hasOpenCritical && pending > 0) warnings.push("Critical findings are still pending.");
+              const pendingCritical = pre.filter((f) => f.severity === "critical" && !review.decisions[f.id]).length;
+              if (review.verdict === "accurate" && pendingCritical > 0) warnings.push(`${pendingCritical} critical finding(s) still pending.`);
               if (review.verdict && review.verdict !== "accurate" && confirmed === 0) warnings.push("No confirmed finding supports this verdict.");
               if (review.verdict === "needs_correction" && !review.correctedSummary.trim()) warnings.push("Add a corrected summary.");
               return (
@@ -321,6 +327,7 @@ export default function ReviewApp() {
           <FindingsPanel
             key={call.id}
             callId={call.id}
+            turns={call.turns}
             findings={findings}
             review={review}
             selectedId={selectedFinding}

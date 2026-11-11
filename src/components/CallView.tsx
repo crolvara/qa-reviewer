@@ -77,8 +77,12 @@ export function TranscriptView({ turns, highlighted }: { turns: Turn[]; highligh
 
   useEffect(() => {
     if (!first || !containerRef.current) return;
+    // Only on the 3-column desktop layout, where the transcript scrolls in its own pane.
+    // On phones the evidence is shown inside the finding card instead, so the page is not yanked away.
+    if (!window.matchMedia("(min-width: 1024px)").matches) return;
     const el = containerRef.current.querySelector<HTMLElement>(`[data-turn="${first}"]`);
-    el?.scrollIntoView({ block: "center", behavior: "smooth" });
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
   }, [first, highlighted]);
 
   return (

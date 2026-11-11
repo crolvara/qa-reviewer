@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CallReview, Finding, FindingType, Severity } from "@/lib/types";
+import type { CallReview, Finding, FindingType, Severity, Turn } from "@/lib/types";
 import { Badge, SEVERITY_STYLE, SOURCE_LABEL, TYPE_LABEL } from "./ui";
 
 const SEVERITY_ORDER: Record<Severity, number> = { critical: 0, major: 1, minor: 2 };
 
 export function FindingsPanel({
-  callId, findings, review, selectedId, onSelect, onDecide, onAdd, onRemove,
+  callId, turns, findings, review, selectedId, onSelect, onDecide, onAdd, onRemove,
 }: {
   callId: string;
+  turns: Turn[];
   findings: Finding[];
   review: CallReview;
   selectedId: string | null;
@@ -69,9 +70,23 @@ export function FindingsPanel({
                 {f.turns.length > 0 && <p className="mt-0.5 font-mono text-xs text-slate-600">Evidence: {callId} {f.turns.join(", ")}</p>}
               </button>
 
-              {selected && (f.explanation || f.suggestedFix) && (
+              {selected && (f.explanation || f.suggestedFix || f.turns.length > 0) && (
                 <div className="mt-2 space-y-2 border-t border-slate-100 pt-2 text-sm text-slate-700">
                   {f.explanation && <p>{f.explanation}</p>}
+                  {/* Evidence inline, so it sits next to the finding on every layout (on phones the transcript is far above). */}
+                  {f.turns.length > 0 && (
+                    <ul className="space-y-1 rounded-md bg-yellow-50 p-2 text-xs ring-1 ring-inset ring-yellow-300" aria-label="Evidence turns">
+                      {f.turns.map((id) => {
+                        const t = turns.find((x) => x.id === id);
+                        return (
+                          <li key={id}>
+                            <span className="font-mono font-semibold">{id}</span>{" "}
+                            {t ? <><span className="font-semibold">{t.speaker}:</span> {t.text}</> : <em>turn not found</em>}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                   {f.suggestedFix && (
                     <p>
                       <span className="font-semibold text-slate-900">Suggested fix: </span>
