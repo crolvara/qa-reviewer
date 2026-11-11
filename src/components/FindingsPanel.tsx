@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CallReview, Finding, FindingType, Severity } from "@/lib/types";
 import { Badge, SEVERITY_STYLE, SOURCE_LABEL, TYPE_LABEL } from "./ui";
 
@@ -20,6 +20,14 @@ export function FindingsPanel({
 }) {
   const sorted = [...findings].sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
   const pending = findings.filter((f) => f.source !== "reviewer" && !review.decisions[f.id]).length;
+
+  // Bring the selected card into view (on phones the panel sits below the transcript).
+  useEffect(() => {
+    if (!selectedId) return;
+    const el = document.querySelector<HTMLElement>(`[data-finding="${CSS.escape(selectedId)}"]`);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, [selectedId]);
 
   return (
     <section aria-labelledby="findings-h">
@@ -43,12 +51,13 @@ export function FindingsPanel({
           return (
             <li
               key={f.id}
+              data-finding={f.id}
               // Rejected = dashed, tinted card + struck title. No opacity: fading text fails WCAG contrast.
               className={`rounded-lg border p-3 shadow-sm transition ${
                 selected ? "border-indigo-500 ring-2 ring-indigo-200" : "border-slate-200"
               } ${decision === "rejected" ? "border-dashed bg-slate-50 shadow-none" : "bg-white"}`}
             >
-              <button type="button" className="w-full text-left" onClick={() => onSelect(selected ? null : f.id)}>
+              <button type="button" aria-expanded={selected} className="w-full text-left" onClick={() => onSelect(selected ? null : f.id)}>
                 <div className="mb-1 flex flex-wrap items-center gap-1">
                   <Badge className={SEVERITY_STYLE[f.severity]}>{f.severity}</Badge>
                   <Badge className="bg-white text-slate-700 ring-slate-300">{TYPE_LABEL[f.type]}</Badge>
@@ -131,10 +140,13 @@ function AddFindingForm({ callId, onAdd }: { callId: string; onAdd: (f: Finding)
     e.preventDefault();
     const cleanTitle = title.trim();
     if (!cleanTitle) return;
+    // Accept "T5", "t05" or "5" and normalise to the transcript's zero-padded "T05".
     const turnIds = turns
       .toUpperCase()
-      .split(/[\s,]+/)
-      .filter((t) => /^T\d+$/.test(t));
+      .split(/[\s,;]+/)
+      .map((t) => t.match(/^T?(\d{1,3})$/)?.[1])
+      .filter((n): n is string => !!n)
+      .map((n) => `T${n.padStart(2, "0")}`);
     onAdd({
       id: `${callId}-rev-${Date.now()}`,
       source: "reviewer",

@@ -9,6 +9,24 @@ Completed tasks, newest first. Format:
 - Decisions, caveats or follow-ups
 ```
 
+## 2026-11-11 - Replace native confirm() popups with in-app dialog
+- Reset and "Start from AI suggested correction" used `window.confirm()`, which shows an unstyled browser popup with the site URL. Replaced with a styled modal (`useConfirm()` hook on native `<dialog>.showModal()`).
+- Destructive dialogs use a red confirm button and focus Cancel first. Esc and backdrop click cancel. Focus returns to the trigger.
+- J/K/1/2/3 shortcuts are now ignored while a dialog is open, so keys cannot change a verdict behind the modal.
+- Verified in Edge headless (Playwright): dialog opens, Esc/backdrop cancel, "2" ignored while open, confirm clears reviews, no native dialog fired, fits at 320px.
+- Files: `src/components/ConfirmDialog.tsx` (new), `src/components/ReviewApp.tsx`.
+
+## 2026-11-11 - Fixes from independent review (correctness, security, a11y)
+- Verdict tied to findings: confirmed/rejected/pending counts, warnings for contradictions (Accurate with confirmed findings, verdict without support, Needs correction without corrected summary). Click no longer silently clears a verdict; explicit "Clear verdict".
+- Dedupe: rule finding merges into an AI finding only when the AI title is about the same rule (`matchKey`) and quote/turns overlap. Verified: one turn with signposting + MoneyHelper now yields both findings; real data unchanged (6 Rule-confirmed).
+- Storage: field-by-field validation of saved data (no crash on corrupt storage), sync between tabs via `storage` event, "not saved" banner on write failure.
+- CSV guard also catches leading whitespace, newline and full-width `＝＋－＠`.
+- J/K navigate relative to the full list (works after the call leaves a filter); key repeat ignored.
+- Turn IDs normalised ("T5", "5" -> "T05"). Voicemail summaries exempt from sentence count; "1 sentence" wording. "Unclear speaker" no longer auto-labelled as hallucination.
+- Security headers: X-Frame-Options DENY, frame-ancestors 'none', nosniff, no-referrer, Permissions-Policy, noindex.
+- A11y: highlight buttons announce severity and finding; finding cards expose `aria-expanded`.
+- Follow-up, same day: content-hash finding IDs (FNV-1a, 30/30 unique), rule IDs from title; keyboard shortcuts toggle (WCAG 2.1.4, remembered per browser); selected finding card scrolls into view (respects reduced motion); AI verdict collapsed by default against anchoring bias; full static CSP (`default-src 'self'`, no nonces by design). Verified on local `next start`: headers present, 16/16 browser checks, 0 console errors.
+
 ## 2026-11-11 - Fix colour contrast (Lighthouse / WCAG AA)
 - Small grey text `text-slate-500` / `text-slate-400` failed 4.5:1 on `indigo-50` and `slate-100` backgrounds. All changed to `text-slate-600`.
 - Suspected-hallucination transcript turns (`opacity-60`) and rejected findings (`opacity-55`) faded text to ~2.9:1. Replaced opacity with a tinted, dashed treatment; badge and strike-through still mark the state.

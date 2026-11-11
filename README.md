@@ -58,11 +58,12 @@ Node 20+. No environment variables, no database, no API keys.
 
 ## Known limitations
 
-- Decisions live in one browser; another reviewer or device starts empty. Two open tabs overwrite each other.
+- Decisions live in one browser; another reviewer or device starts empty. Open tabs sync via the storage event, but simultaneous edits to the same call are last-write-wins.
+- CSP allows `'unsafe-inline'` scripts because Next.js's prerendered bootstrap is inline; nonces would force per-request rendering of a static app. No third-party origins are allowed and no user HTML is rendered.
 - No audit trail of who decided what.
-- AI findings are static for this dataset; finding IDs are position-based, so regenerating them could misalign saved decisions.
+- AI findings are static for this dataset (finding IDs are content hashes, so saved decisions survive reordering).
 - Overlapping highlights in the summary show only the first; all findings remain in the list.
-- On mobile, clicking a highlight does not scroll to its finding card. Tab and verdict groups lack arrow-key navigation.
+- Tab and verdict groups lack arrow-key navigation.
 
 ## What I would tackle next
 

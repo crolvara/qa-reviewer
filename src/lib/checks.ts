@@ -126,11 +126,13 @@ export function runRuleChecks(callId: string, summary: string, turns: Turn[]): F
   }
 
   // Format.
+  // Gatekeeper outputs ("Incomplete call.", voicemail) are valid one-liners.
+  const isGatekeeper = /^(Incomplete call\.|Voicemail (left|reached))/i.test(summary.trim());
   const count = splitSentences(summary).length;
-  if (summary.trim() !== "Incomplete call." && (count < 2 || count > 5)) {
+  if (!isGatekeeper && (count < 2 || count > 5)) {
     add({
       type: "rule_breach", severity: "minor", certainty: "definite", summaryQuote: null, turns: [],
-      title: `Summary has ${count} sentences (rule: 2 to 5)`,
+      title: `Summary has ${count} sentence${count === 1 ? "" : "s"} (rule: 2 to 5)`,
       explanation: "The rules require a concise summary of 2 to 5 complete sentences.",
       suggestedFix: null,
     });
@@ -148,5 +150,24 @@ export function runRuleChecks(callId: string, summary: string, turns: Turn[]): F
     }
   }
 
+  for (const f of out) {
+    f.matchKey = matchKeyFor(f.title);
+    // Stable ID from the rule title (unique per call), not from check order.
+    f.id = `${callId}-rule-${f.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+  }
   return out;
+}
+
+/** What an AI finding must talk about to be treated as the same issue as a rule finding. */
+function matchKeyFor(title: string): RegExp {
+  const referral = title.match(/^Referral to (.+) not mentioned$/);
+  if (referral?.[1]) return new RegExp(referral[1].replace(/\s+/g, "\\s*"), "i");
+  if (/^Arrears/.test(title)) return /arrears|balance/i;
+  if (/^Amount of payment/.test(title)) return /payment/i;
+  if (/^Call direction/.test(title)) return /direction|inbound|outbound|called/i;
+  if (/risk of further action|"further action"/.test(title)) return /further action/i;
+  if (/signposted/.test(title)) return /signpost/i;
+  if (/sentence/.test(title)) return /sentence/i;
+  if (/^American spelling/.test(title)) return /spelling|british|american/i;
+  return /(?!)/; // never matches
 }

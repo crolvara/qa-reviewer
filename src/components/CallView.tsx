@@ -48,6 +48,7 @@ export function SummaryView({
             type="button"
             onClick={() => onSelect(s.finding!.id)}
             title={s.finding.title}
+            aria-label={`${s.text} (${s.finding.severity} finding: ${s.finding.title})`}
             className={`rounded-sm px-0.5 text-left underline decoration-2 underline-offset-4 ${HIGHLIGHT_STYLE[s.finding.severity]} ${
               selectedId === s.finding.id ? "outline-2 outline-offset-1 outline-indigo-600" : ""
             }`}

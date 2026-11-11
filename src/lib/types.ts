@@ -20,6 +20,8 @@ export interface Finding {
   suggestedFix: string | null;
   /** AI finding independently matched by a deterministic rule check. */
   ruleConfirmed?: boolean;
+  /** Rule findings only: words an AI finding must mention to count as the same issue. */
+  matchKey?: RegExp;
 }
 
 export interface Turn {

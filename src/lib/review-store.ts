@@ -8,12 +8,51 @@ const STORAGE_KEY = "qa-reviewer:v1";
 
 type Reviews = Record<string, CallReview>;
 
+const VERDICT_VALUES = new Set(["accurate", "minor_issues", "needs_correction"]);
+const str = (v: unknown, max = 5000): string => (typeof v === "string" ? v.slice(0, max) : "");
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
+
+/** Validate one stored review field by field; anything malformed falls back to a safe default. */
+function sanitizeReview(v: unknown): CallReview {
+  if (!isRecord(v)) return EMPTY_REVIEW;
+  const decisions: CallReview["decisions"] = {};
+  if (isRecord(v.decisions)) {
+    for (const [k, d] of Object.entries(v.decisions)) if (d === "accepted" || d === "rejected") decisions[k] = d;
+  }
+  const reviewerFindings = (Array.isArray(v.reviewerFindings) ? v.reviewerFindings : [])
+    .filter(isRecord)
+    .filter((f) => typeof f.id === "string" && typeof f.title === "string")
+    .map((f): Finding => ({
+      id: f.id as string,
+      source: "reviewer",
+      type: (["contradicted", "unsupported", "omission", "rule_breach"].includes(f.type as string) ? f.type : "contradicted") as Finding["type"],
+      severity: (["critical", "major", "minor"].includes(f.severity as string) ? f.severity : "major") as Finding["severity"],
+      certainty: "definite",
+      summaryQuote: null,
+      turns: Array.isArray(f.turns) ? f.turns.filter((t): t is string => typeof t === "string") : [],
+      title: str(f.title, 200),
+      explanation: str(f.explanation),
+      suggestedFix: null,
+    }));
+  return {
+    verdict: VERDICT_VALUES.has(v.verdict as string) ? (v.verdict as CallReview["verdict"]) : null,
+    decisions,
+    reviewerFindings,
+    note: str(v.note),
+    correctedSummary: str(v.correctedSummary),
+    updatedAt: typeof v.updatedAt === "string" ? v.updatedAt : null,
+  };
+}
+
 function load(): Reviews {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return {};
     const parsed: unknown = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? (parsed as Reviews) : {};
+    if (!isRecord(parsed)) return {};
+    const out: Reviews = {};
+    for (const [id, r] of Object.entries(parsed)) if (/^CALL-\d+$/.test(id)) out[id] = sanitizeReview(r);
+    return out;
   } catch {
     return {};
   }
@@ -31,14 +70,26 @@ export function useReviews() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-off sync from external storage after mount
     setReviews(load());
     setLoaded(true);
+    // Another tab saved: adopt its state instead of overwriting it on our next write.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) setReviews(load());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  const [saveFailed, setSaveFailed] = useState(false);
   useEffect(() => {
     if (!loaded) return;
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+      const next = JSON.stringify(reviews);
+      // Skip identical writes (e.g. right after syncing from another tab).
+      if (window.localStorage.getItem(STORAGE_KEY) !== next) window.localStorage.setItem(STORAGE_KEY, next);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reflects the external storage result
+      setSaveFailed(false);
     } catch {
-      // Storage full or blocked: the app keeps working in memory.
+      // Storage full or blocked: keep working in memory, but tell the reviewer.
+      setSaveFailed(true);
     }
   }, [reviews, loaded]);
 
@@ -51,7 +102,7 @@ export function useReviews() {
 
   const reset = useCallback(() => setReviews({}), []);
 
-  return { reviews, loaded, update, reset };
+  return { reviews, loaded, update, reset, saveFailed };
 }
 
 export function getReview(reviews: Reviews, callId: string): CallReview {
@@ -80,7 +131,8 @@ export function isOpen(f: Finding, review: CallReview): boolean {
 
 function csvCell(value: string): string {
   // Neutralise spreadsheet formula injection, then quote.
-  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  // Checks after leading whitespace too, and full-width variants some spreadsheets accept.
+  const safe = /^[=+\-@\t\r\n＝＋－＠]/.test(value.trimStart()) ? `'${value}` : value;
   return `"${safe.replace(/"/g, '""')}"`;
 }
 

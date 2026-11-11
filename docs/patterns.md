@@ -4,7 +4,7 @@ Reusable patterns established in this project. Each entry: what it is, when to u
 
 ## Code
 
-_None yet._
+- **No `window.confirm()` / `alert()` / `prompt()`.** Use `const [confirm, confirmDialog] = useConfirm()` from `src/components/ConfirmDialog.tsx`, render `{confirmDialog}` once, then `if (await confirm({ title, message, confirmLabel, destructive })) ...`. Built on native `<dialog>.showModal()` for focus trap, Esc and top layer. Global keyboard shortcuts must bail out when `target.closest("dialog[open]")`.
 
 ## Design / UX
 
