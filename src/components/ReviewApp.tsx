@@ -5,6 +5,7 @@ import { CALLS, formatCallDate } from "@/lib/data";
 import { allFindings, download, getReview, isOpen, toCsv, useReviews } from "@/lib/review-store";
 import type { Call, CallReview, Severity, Verdict } from "@/lib/types";
 import { SummaryView, TranscriptView } from "./CallView";
+import { useConfirm } from "./ConfirmDialog";
 import { FindingsPanel } from "./FindingsPanel";
 import { Badge, SEVERITY_STYLE, VERDICT_LABEL, VERDICT_STYLE } from "./ui";
 
@@ -22,6 +23,7 @@ export default function ReviewApp() {
   const [currentId, setCurrentId] = useState<string>(CALLS[0]?.id ?? "");
   const [filter, setFilter] = useState<Filter>("all");
   const [selectedFinding, setSelectedFinding] = useState<string | null>(null);
+  const [confirm, confirmDialog] = useConfirm();
 
   const call = CALLS.find((c) => c.id === currentId) ?? CALLS[0];
   const review = call ? getReview(reviews, call.id) : null;
@@ -48,6 +50,8 @@ export default function ReviewApp() {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      // A modal is open: shortcuts must not change data behind it.
+      if (target?.closest?.("dialog[open]")) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === "Escape") {
         setSelectedFinding(null);
@@ -99,7 +103,15 @@ export default function ReviewApp() {
           <button type="button" onClick={exportJson} className="whitespace-nowrap rounded-md bg-white px-2.5 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50">Export JSON</button>
           <button
             type="button"
-            onClick={() => { if (window.confirm("Clear all review decisions in this browser?")) reset(); }}
+            onClick={async () => {
+              const ok = await confirm({
+                title: "Reset all reviews?",
+                message: "This clears every verdict, decision and correction saved in this browser. Export first if you need them.",
+                confirmLabel: "Reset",
+                destructive: true,
+              });
+              if (ok) reset();
+            }}
             className="whitespace-nowrap rounded-md px-2.5 py-1 text-sm text-slate-600 hover:bg-slate-100"
           >
             Reset
@@ -279,9 +291,17 @@ export default function ReviewApp() {
             {call.aiCorrectedSummary && (
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   const current = review.correctedSummary.trim();
-                  if (current && current !== call.aiCorrectedSummary && !window.confirm("Replace your corrected summary with the AI suggestion?")) return;
+                  if (current && current !== call.aiCorrectedSummary) {
+                    const ok = await confirm({
+                      title: "Replace your corrected summary?",
+                      message: "Your edits will be overwritten with the AI suggestion.",
+                      confirmLabel: "Replace",
+                      destructive: true,
+                    });
+                    if (!ok) return;
+                  }
                   update(call.id, (r) => ({ ...r, correctedSummary: call.aiCorrectedSummary ?? "" }));
                 }}
                 className="text-xs font-medium text-indigo-700 underline hover:text-indigo-900"
@@ -301,6 +321,7 @@ export default function ReviewApp() {
           </section>
         </aside>
       </div>
+      {confirmDialog}
     </div>
   );
 }
