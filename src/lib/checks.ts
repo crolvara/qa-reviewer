@@ -1,0 +1,152 @@
+import type { Finding, Turn } from "./types";
+
+/**
+ * Deterministic rule checks. Deliberately narrow: each one matches an exact
+ * required phrase or a forbidden pattern from summary-rules.txt. Semantic
+ * errors (wrong promise, invented facts) are left to the AI pre-review and the
+ * reviewer. Loose keyword checks were tried and produced false positives.
+ */
+
+const US_SPELLINGS: Array<[RegExp, string]> = [
+  [/\bauthorized\b/i, "authorised"],
+  [/\bcenter\b/i, "centre"],
+  [/\bprogram\b/i, "programme"],
+  [/\borganization\b/i, "organisation"],
+  [/\bbehavior\b/i, "behaviour"],
+  [/\bcanceled\b/i, "cancelled"],
+  [/\bcolor\b/i, "colour"],
+];
+
+const ADVICE_BODIES = ["StepChange", "Citizens Advice", "MoneyHelper", "Money Helper", "National Debtline"];
+
+export function splitSentences(text: string): string[] {
+  // Split on sentence-ending punctuation followed by a capital letter, so "5.30 pm" stays intact.
+  return text.split(/(?<=[.!?])\s+(?=[A-Z])/).filter((s) => s.trim().length > 0);
+}
+
+function agentTurns(turns: Turn[], re: RegExp): string[] {
+  return turns.filter((t) => t.kind === "agent" && re.test(t.text)).map((t) => t.id);
+}
+
+export function runRuleChecks(callId: string, summary: string, turns: Turn[]): Finding[] {
+  const out: Finding[] = [];
+  let n = 0;
+  const add = (f: Omit<Finding, "id" | "source">) => out.push({ ...f, id: `${callId}-rule-${++n}`, source: "rule" });
+
+  // Arrears / balance amounts are forbidden.
+  const arrears = summary.match(/(arrears|balance)[^.;]{0,25}£[\d,.]+|£[\d,.]+[^.;]{0,15}\b(arrears|balance)/i);
+  if (arrears) {
+    add({
+      type: "rule_breach", severity: "major", certainty: "definite", summaryQuote: arrears[0], turns: [],
+      title: "Arrears or balance amount stated",
+      explanation: "The rules forbid specific values for arrears or total balance.",
+      suggestedFix: "State only that arrears were discussed.",
+    });
+  }
+
+  // Amount of a payment taken during the call is forbidden.
+  const paid = summary.match(/payment of £[\d,.]+[^.;]{0,10}\b(made|taken)\b/i);
+  if (paid) {
+    add({
+      type: "rule_breach", severity: "major", certainty: "definite", summaryQuote: paid[0], turns: [],
+      title: "Amount of payment made stated",
+      explanation: "The rules require the phrase \"Payment made.\" without the amount.",
+      suggestedFix: "Payment made.",
+    });
+  }
+
+  // Call direction, inferred from the opening turn.
+  const first = turns[0];
+  if (first && first.kind === "agent") {
+    const outbound = /\b(speak to|speaking to|calling from)\b/i.test(first.text);
+    const inbound = /how can i help/i.test(first.text);
+    const saysInbound = summary.match(/The customer called the company/);
+    const saysOutbound = summary.match(/The company called/);
+    if (outbound && saysInbound) {
+      add({
+        type: "contradicted", severity: "critical", certainty: "definite", summaryQuote: saysInbound[0], turns: [first.id],
+        title: "Call direction: outbound call recorded as inbound",
+        explanation: "The agent opened by asking for a named person, so the company called the customer.",
+        suggestedFix: "The company called and reached the customer.",
+      });
+    }
+    if (inbound && saysOutbound) {
+      add({
+        type: "contradicted", severity: "critical", certainty: "definite", summaryQuote: saysOutbound[0], turns: [first.id],
+        title: "Call direction: inbound call recorded as outbound",
+        explanation: "The agent opened with a general service greeting, so the customer called the company.",
+        suggestedFix: "The customer called the company.",
+      });
+    }
+  }
+
+  // Required phrases when the agent did the thing.
+  const riskTurns = agentTurns(turns, /risk of further action/i);
+  if (riskTurns.length && !/risk of further action/i.test(summary)) {
+    add({
+      type: "omission", severity: "major", certainty: "definite", summaryQuote: null, turns: riskTurns,
+      title: "Missing \"risk of further action\"",
+      explanation: "The agent explicitly warned of further action; the rules require this phrase.",
+      suggestedFix: "Add: the customer was warned the account is at risk of further action.",
+    });
+  }
+
+  const webTurns = agentTurns(turns, /website|signpost/i);
+  if (webTurns.length && !/customer signposted/i.test(summary)) {
+    add({
+      type: "omission", severity: "major", certainty: "uncertain", summaryQuote: null, turns: webTurns,
+      title: "Missing \"customer signposted\"",
+      explanation: "The agent mentioned the website or signposting; the rules require \"customer signposted\". Check the turn is support-related.",
+      suggestedFix: "Add: customer signposted.",
+    });
+  }
+
+  for (const body of ADVICE_BODIES) {
+    const re = new RegExp(body, "i");
+    const bodyTurns = agentTurns(turns, re);
+    if (bodyTurns.length && !re.test(summary)) {
+      add({
+        type: "omission", severity: "major", certainty: "uncertain", summaryQuote: null, turns: bodyTurns,
+        title: `Referral to ${body} not mentioned`,
+        explanation: "The agent referred the customer to an advice body; the rules require external advice referrals.",
+        suggestedFix: `Add the ${body} referral.`,
+      });
+    }
+  }
+
+  // Terminology: "further action" only allowed as "risk of further action".
+  const further = summary.match(/[^.;]*\bfurther action\b[^.;]*/i);
+  if (further && !/risk of further action/i.test(further[0])) {
+    add({
+      type: "rule_breach", severity: "minor", certainty: "definite", summaryQuote: further[0].trim(), turns: [],
+      title: "\"further action\" used for next steps",
+      explanation: "The rules reserve \"further action\" for the risk warning.",
+      suggestedFix: "Use \"next steps\".",
+    });
+  }
+
+  // Format.
+  const count = splitSentences(summary).length;
+  if (summary.trim() !== "Incomplete call." && (count < 2 || count > 5)) {
+    add({
+      type: "rule_breach", severity: "minor", certainty: "definite", summaryQuote: null, turns: [],
+      title: `Summary has ${count} sentences (rule: 2 to 5)`,
+      explanation: "The rules require a concise summary of 2 to 5 complete sentences.",
+      suggestedFix: null,
+    });
+  }
+
+  for (const [re, uk] of US_SPELLINGS) {
+    const m = summary.match(re);
+    if (m) {
+      add({
+        type: "rule_breach", severity: "minor", certainty: "definite", summaryQuote: m[0], turns: [],
+        title: `American spelling "${m[0]}"`,
+        explanation: "The summary must use British English.",
+        suggestedFix: uk,
+      });
+    }
+  }
+
+  return out;
+}
