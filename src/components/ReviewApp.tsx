@@ -49,15 +49,26 @@ export default function ReviewApp() {
       const target = e.target as HTMLElement | null;
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const idx = CALLS.findIndex((c) => c.id === currentId);
-      if (e.key === "j" && idx < CALLS.length - 1) goTo(CALLS[idx + 1]!.id);
-      if (e.key === "k" && idx > 0) goTo(CALLS[idx - 1]!.id);
+      if (e.key === "Escape") {
+        setSelectedFinding(null);
+        return;
+      }
+      // Case-insensitive so Caps Lock or Shift does not silently break shortcuts.
+      const key = e.key.toLowerCase();
+      // Navigate within the filtered queue the reviewer is looking at.
+      const list = visible.length > 0 ? visible : CALLS;
+      const idx = list.findIndex((c) => c.id === currentId);
+      if (key === "j") {
+        const next = list[idx + 1] ?? (idx === -1 ? list[0] : undefined);
+        if (next) goTo(next.id);
+      }
+      if (key === "k" && idx > 0) goTo(list[idx - 1]!.id);
       const v = VERDICTS[Number(e.key) - 1];
       if (v && ["1", "2", "3"].includes(e.key)) update(currentId, (r) => ({ ...r, verdict: v }));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [currentId, update]);
+  }, [currentId, update, visible]);
 
   if (!call || !review) return <p className="p-6">No calls found.</p>;
 
@@ -70,30 +81,33 @@ export default function ReviewApp() {
   const exportJson = () => download(`qa-review-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(reviews, null, 2), "application/json");
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 lg:h-screen">
-      <header className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-4 py-2.5">
+    // w-full + min-w-0: the root is a flex item of <body>; without these it grows to its widest child and the page scrolls sideways on phones.
+    <div className="flex min-h-screen w-full min-w-0 flex-col bg-slate-50 text-slate-900 lg:h-screen">
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white px-4 py-2.5">
         <h1 className="text-base font-bold tracking-tight">QA Reviewer</h1>
         <span className="text-sm text-slate-600">Call summary accuracy</span>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-sm text-slate-700" aria-live="polite">
-            <strong>{loaded ? reviewedCount : "–"}</strong> / {CALLS.length} reviewed
-          </span>
-          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-200" aria-hidden>
-            <div className="h-full bg-indigo-600" style={{ width: `${(reviewedCount / CALLS.length) * 100}%` }} />
+        <div className="flex flex-wrap items-center gap-2 max-sm:w-full sm:ml-auto">
+          <div className="flex items-center gap-2 max-sm:w-full">
+            <span className="whitespace-nowrap text-sm text-slate-700" aria-live="polite">
+              <strong>{loaded ? reviewedCount : "-"}</strong> / {CALLS.length} reviewed
+            </span>
+            <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-200 max-sm:flex-1" aria-hidden>
+              <div className="h-full bg-indigo-600" style={{ width: `${(reviewedCount / CALLS.length) * 100}%` }} />
+            </div>
           </div>
-          <button type="button" onClick={exportCsv} className="rounded-md bg-white px-2.5 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50">Export CSV</button>
-          <button type="button" onClick={exportJson} className="rounded-md bg-white px-2.5 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50">Export JSON</button>
+          <button type="button" onClick={exportCsv} className="whitespace-nowrap rounded-md bg-white px-2.5 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50">Export CSV</button>
+          <button type="button" onClick={exportJson} className="whitespace-nowrap rounded-md bg-white px-2.5 py-1 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-50">Export JSON</button>
           <button
             type="button"
             onClick={() => { if (window.confirm("Clear all review decisions in this browser?")) reset(); }}
-            className="rounded-md px-2.5 py-1 text-sm text-slate-600 hover:bg-slate-100"
+            className="whitespace-nowrap rounded-md px-2.5 py-1 text-sm text-slate-600 hover:bg-slate-100"
           >
             Reset
           </button>
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)_24rem]">
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] lg:grid-cols-[17rem_minmax(0,1fr)_24rem]">
         {/* Queue */}
         <nav aria-label="Calls" className="flex min-h-0 flex-col border-r border-slate-200 bg-white max-lg:max-h-64">
           <div className="flex gap-1 border-b border-slate-200 p-2" role="tablist">
@@ -111,7 +125,7 @@ export default function ReviewApp() {
             ))}
           </div>
           <ul className="min-h-0 flex-1 overflow-y-auto">
-            {visible.length === 0 && <li className="p-3 text-sm text-slate-500">No calls in this view.</li>}
+            {visible.length === 0 && <li className="p-3 text-sm text-slate-600">No calls in this view.</li>}
             {visible.map((c) => {
               const r = getReview(reviews, c.id);
               const sc = severityCounts(c, r);
@@ -129,7 +143,7 @@ export default function ReviewApp() {
                       {r.verdict ? (
                         <Badge className={VERDICT_STYLE[r.verdict]}>{VERDICT_LABEL[r.verdict]}</Badge>
                       ) : (
-                        <span className="text-[11px] text-slate-500">Not reviewed</span>
+                        <span className="text-[11px] text-slate-600">Not reviewed</span>
                       )}
                     </div>
                     <div className="mt-1 flex gap-1 text-[11px]">
@@ -140,14 +154,14 @@ export default function ReviewApp() {
                           </span>
                         ) : null,
                       )}
-                      {sc.critical + sc.major + sc.minor === 0 && <span className="text-slate-500">No open flags</span>}
+                      {sc.critical + sc.major + sc.minor === 0 && <span className="text-slate-600">No open flags</span>}
                     </div>
                   </button>
                 </li>
               );
             })}
           </ul>
-          <p className="border-t border-slate-200 p-2 text-[11px] text-slate-500">Keys: J/K next/previous · 1/2/3 verdict</p>
+          <p className="border-t border-slate-200 p-2 text-[11px] text-slate-600">Keys: J/K next/previous · 1/2/3 verdict · Esc clear selection</p>
         </nav>
 
         {/* Summary + transcript */}
@@ -190,7 +204,7 @@ export default function ReviewApp() {
 
           <section aria-labelledby="transcript-h" className="rounded-lg border border-slate-200 bg-white p-2 shadow-sm">
             <h3 id="transcript-h" className="px-2 pb-1 pt-2 text-sm font-semibold uppercase tracking-wide text-slate-600">
-              Transcript <span className="font-normal normal-case text-slate-500">(the reference)</span>
+              Transcript <span className="font-normal normal-case text-slate-600">(the reference)</span>
             </h3>
             <TranscriptView turns={call.turns} highlighted={highlightedTurns} />
           </section>
@@ -212,7 +226,7 @@ export default function ReviewApp() {
                     review.verdict === v ? VERDICT_STYLE[v] + " ring-2" : "bg-white text-slate-700 ring-slate-300 hover:bg-slate-50"
                   }`}
                 >
-                  <span className="mr-1 text-slate-400">{i + 1}</span>
+                  <span className="mr-1 text-slate-600">{i + 1}</span>
                   {VERDICT_LABEL[v]}
                 </button>
               ))}
@@ -228,6 +242,7 @@ export default function ReviewApp() {
           </section>
 
           <FindingsPanel
+            key={call.id}
             callId={call.id}
             findings={findings}
             review={review}
@@ -264,7 +279,11 @@ export default function ReviewApp() {
             {call.aiCorrectedSummary && (
               <button
                 type="button"
-                onClick={() => update(call.id, (r) => ({ ...r, correctedSummary: call.aiCorrectedSummary ?? "" }))}
+                onClick={() => {
+                  const current = review.correctedSummary.trim();
+                  if (current && current !== call.aiCorrectedSummary && !window.confirm("Replace your corrected summary with the AI suggestion?")) return;
+                  update(call.id, (r) => ({ ...r, correctedSummary: call.aiCorrectedSummary ?? "" }));
+                }}
                 className="text-xs font-medium text-indigo-700 underline hover:text-indigo-900"
               >
                 Start from AI suggested correction

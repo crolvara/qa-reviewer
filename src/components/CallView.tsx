@@ -66,8 +66,8 @@ const SPEAKER_STYLE: Record<Turn["kind"], string> = {
   agent: "text-indigo-800",
   customer: "text-emerald-800",
   third_party: "text-fuchsia-800",
-  note: "text-slate-500",
-  unclear: "text-slate-500",
+  note: "text-slate-600",
+  unclear: "text-slate-600",
 };
 
 export function TranscriptView({ turns, highlighted }: { turns: Turn[]; highlighted: string[] }) {
@@ -89,11 +89,11 @@ export function TranscriptView({ turns, highlighted }: { turns: Turn[]; highligh
           <li
             key={t.id}
             data-turn={t.id}
-            className={`grid grid-cols-[3.25rem_1fr] gap-2 rounded-md px-2 py-1.5 text-sm leading-6 ${
+            className={`grid grid-cols-[3.25rem_minmax(0,1fr)] gap-2 break-words rounded-md px-2 py-1.5 text-sm leading-6 ${
               isHit ? "bg-yellow-100 ring-2 ring-yellow-400" : ""
-            } ${t.suspectHallucination ? "opacity-60" : ""}`}
+            } ${t.suspectHallucination ? "bg-slate-50 outline-1 -outline-offset-1 outline-dashed outline-slate-300" : ""}`}
           >
-            <span className="pt-0.5 font-mono text-xs text-slate-500">
+            <span className="pt-0.5 font-mono text-xs text-slate-600">
               {t.id}
               <br />
               {t.time}

@@ -8,7 +8,8 @@ _None yet._
 
 ## Design / UX
 
-_None yet._
+- **No horizontal overflow on phones.** Use `minmax(0,1fr)` instead of `1fr` / `grid-cols-1` for grid tracks, add `min-w-0` to flex children that hold text, and let toolbar rows `flex-wrap` with `whitespace-nowrap` on buttons. Check at 320px: `document.documentElement.scrollWidth` must equal `clientWidth`.
+- **Text contrast floor.** Smallest grey for text is `slate-600` (passes 4.5:1 on white, `slate-100`, `indigo-50`). Never use `opacity-*` to show a muted or rejected state on text; use a tinted background, dashed border, strike-through or a badge. Verify with axe-core `color-contrast` across every call, not one page load.
 
 ## Testing / QA
 

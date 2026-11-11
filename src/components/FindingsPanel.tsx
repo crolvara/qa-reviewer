@@ -27,7 +27,7 @@ export function FindingsPanel({
         <h2 id="findings-h" className="text-sm font-semibold uppercase tracking-wide text-slate-600">
           Findings ({findings.length})
         </h2>
-        <span className="text-xs text-slate-500">{pending} awaiting decision</span>
+        <span className="text-xs text-slate-600">{pending} awaiting decision</span>
       </div>
 
       {sorted.length === 0 && (
@@ -43,9 +43,10 @@ export function FindingsPanel({
           return (
             <li
               key={f.id}
-              className={`rounded-lg border bg-white p-3 shadow-sm transition ${
+              // Rejected = dashed, tinted card + struck title. No opacity: fading text fails WCAG contrast.
+              className={`rounded-lg border p-3 shadow-sm transition ${
                 selected ? "border-indigo-500 ring-2 ring-indigo-200" : "border-slate-200"
-              } ${decision === "rejected" ? "opacity-55" : ""}`}
+              } ${decision === "rejected" ? "border-dashed bg-slate-50 shadow-none" : "bg-white"}`}
             >
               <button type="button" className="w-full text-left" onClick={() => onSelect(selected ? null : f.id)}>
                 <div className="mb-1 flex flex-wrap items-center gap-1">
@@ -53,15 +54,15 @@ export function FindingsPanel({
                   <Badge className="bg-white text-slate-700 ring-slate-300">{TYPE_LABEL[f.type]}</Badge>
                   {f.certainty === "uncertain" && <Badge className="bg-violet-50 text-violet-800 ring-violet-300">Uncertain</Badge>}
                   {f.ruleConfirmed && <Badge className="bg-emerald-50 text-emerald-800 ring-emerald-300">Rule-confirmed</Badge>}
-                  <span className="ml-auto text-[11px] text-slate-500">{SOURCE_LABEL[f.source]}</span>
+                  <span className="ml-auto text-[11px] text-slate-600">{SOURCE_LABEL[f.source]}</span>
                 </div>
                 <p className={`text-sm font-semibold text-slate-900 ${decision === "rejected" ? "line-through" : ""}`}>{f.title}</p>
-                {f.turns.length > 0 && <p className="mt-0.5 font-mono text-xs text-slate-500">Evidence: {callId} {f.turns.join(", ")}</p>}
+                {f.turns.length > 0 && <p className="mt-0.5 font-mono text-xs text-slate-600">Evidence: {callId} {f.turns.join(", ")}</p>}
               </button>
 
-              {selected && (
+              {selected && (f.explanation || f.suggestedFix) && (
                 <div className="mt-2 space-y-2 border-t border-slate-100 pt-2 text-sm text-slate-700">
-                  <p>{f.explanation}</p>
+                  {f.explanation && <p>{f.explanation}</p>}
                   {f.suggestedFix && (
                     <p>
                       <span className="font-semibold text-slate-900">Suggested fix: </span>
